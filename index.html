@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Battleship - Play Against AI</title>
-    <link rel="stylesheet" href="styles.css?v=7">
+    <link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
     <div class="container">
@@ -30,9 +30,10 @@
                 <button class="ship-btn" data-ship="destroyer" data-length="2">Destroyer (2)</button>
             </div>
             <div class="setup-controls">
+                <button id="rotate-btn" class="rotate-btn">🔄 Orientation: Horizontal</button>
                 <button id="undo-btn" class="undo-btn" disabled>↩ Undo Last Placement</button>
             </div>
-            <p class="instructions">Pick a ship, then drag on your board — drag sideways for horizontal, up/down for vertical.</p>
+            <p class="instructions">Pick a ship, then click your board to place it. Use Rotate (or press R / drag up-down) to switch between horizontal and vertical.</p>
             <div id="player-board-setup" class="board"></div>
             <button id="start-game-btn" class="start-btn">Start Game</button>
         </div>
@@ -84,6 +85,6 @@
         </div>
     </div>
 
-    <script src="game.js?v=7"></script>
+    <script src="game.js?v=8"></script>
 </body>
 </html>

@@ -28,7 +28,9 @@ let gameState = {
     placementHistory: [],
     dragging: false,
     dragStart: null,
-    dragOrientation: true
+    dragOrientation: true,
+    currentOrientation: true,
+    lastHoverCell: null
 };
 
 // Initialize boards
@@ -101,6 +103,8 @@ function initSetup() {
     gameState.dragging = false;
     gameState.dragStart = null;
     gameState.dragOrientation = true;
+    gameState.currentOrientation = true;
+    gameState.lastHoverCell = null;
     
     const setupBoard = document.getElementById('player-board-setup');
     renderBoard(setupBoard, gameState.playerBoard, true, false);
@@ -116,6 +120,9 @@ function initSetup() {
     
     // Reset undo button
     document.getElementById('undo-btn').disabled = true;
+    
+    // Reset orientation label
+    updateRotateButton();
     
     // Reset name input
     document.getElementById('player-name').value = '';
@@ -161,24 +168,49 @@ function handleSetupDragStart(row, col) {
     
     gameState.dragging = true;
     gameState.dragStart = { row, col };
-    gameState.dragOrientation = true; // default to horizontal until the user drags
-    showPlacementPreview(row, col, true);
+    // Start from the current orientation; dragging can change it
+    gameState.dragOrientation = gameState.currentOrientation;
+    showPlacementPreview(row, col, gameState.dragOrientation);
 }
 
 // While hovering/dragging across cells
 function handleSetupCellEnter(row, col) {
     if (!gameState.selectedShip) return;
     
+    gameState.lastHoverCell = { row, col };
+    
     if (gameState.dragging && gameState.dragStart) {
         const dr = row - gameState.dragStart.row;
         const dc = col - gameState.dragStart.col;
-        // Dominant drag axis determines orientation
-        const isHorizontal = Math.abs(dc) >= Math.abs(dr);
-        gameState.dragOrientation = isHorizontal;
-        showPlacementPreview(gameState.dragStart.row, gameState.dragStart.col, isHorizontal);
+        // Only change orientation once the drag actually leaves the start cell
+        if (dr !== 0 || dc !== 0) {
+            const isHorizontal = Math.abs(dc) >= Math.abs(dr);
+            gameState.dragOrientation = isHorizontal;
+            gameState.currentOrientation = isHorizontal;
+        }
+        showPlacementPreview(gameState.dragStart.row, gameState.dragStart.col, gameState.dragOrientation);
     } else {
-        // Not dragging yet: show a default horizontal preview under the cursor
-        showPlacementPreview(row, col, true);
+        // Not dragging: preview under the cursor in the current orientation
+        showPlacementPreview(row, col, gameState.currentOrientation);
+    }
+}
+
+// Flip orientation (R key / right-click) and refresh the preview in place
+function toggleOrientation() {
+    gameState.currentOrientation = !gameState.currentOrientation;
+    gameState.dragOrientation = gameState.currentOrientation;
+    if (gameState.dragging && gameState.dragStart) {
+        showPlacementPreview(gameState.dragStart.row, gameState.dragStart.col, gameState.currentOrientation);
+    } else if (gameState.lastHoverCell && gameState.selectedShip) {
+        showPlacementPreview(gameState.lastHoverCell.row, gameState.lastHoverCell.col, gameState.currentOrientation);
+    }
+}
+
+// Keep the Rotate button label in sync with the current orientation
+function updateRotateButton() {
+    const btn = document.getElementById('rotate-btn');
+    if (btn) {
+        btn.textContent = `🔄 Orientation: ${gameState.currentOrientation ? 'Horizontal' : 'Vertical'}`;
     }
 }
 
@@ -612,6 +644,33 @@ function init() {
             handleSetupCellEnter(parseInt(target.dataset.row, 10), parseInt(target.dataset.col, 10));
         }
     }, { passive: true });
+
+    // Press "R" to rotate the ship orientation
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'r' || e.key === 'R') {
+            toggleOrientation();
+            updateRotateButton();
+        }
+    });
+
+    // Rotate button toggles orientation
+    const rotateBtn = document.getElementById('rotate-btn');
+    if (rotateBtn) {
+        rotateBtn.addEventListener('click', () => {
+            toggleOrientation();
+            updateRotateButton();
+        });
+    }
+
+    // Right-click on the setup board also flips orientation
+    const setupBoard = document.getElementById('player-board-setup');
+    if (setupBoard) {
+        setupBoard.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            toggleOrientation();
+            updateRotateButton();
+        });
+    }
 
     // Modal close button
     const modalCloseBtn = document.getElementById('modal-close-btn');
