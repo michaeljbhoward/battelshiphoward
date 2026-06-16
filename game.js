@@ -25,7 +25,10 @@ let gameState = {
     aiTargetMode: false,
     aiTargetCells: [],
     playerName: '',
-    placementHistory: []
+    placementHistory: [],
+    dragging: false,
+    dragStart: null,
+    dragOrientation: true
 };
 
 // Initialize boards
@@ -66,9 +69,18 @@ function renderBoard(boardElement, board, isSetup = false, isAI = false) {
             }
             
             if (isSetup) {
-                cell.addEventListener('click', () => handleSetupClick(row, col));
-                cell.addEventListener('mouseenter', () => handleSetupHover(row, col));
-                cell.addEventListener('mouseleave', () => clearPreview());
+                cell.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    handleSetupDragStart(row, col);
+                });
+                cell.addEventListener('mouseenter', () => handleSetupCellEnter(row, col));
+                cell.addEventListener('mouseleave', () => {
+                    if (!gameState.dragging) clearPreview();
+                });
+                cell.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    handleSetupDragStart(row, col);
+                }, { passive: false });
             } else if (!isAI && gameState.isPlayerTurn && !gameState.gameOver) {
                 cell.addEventListener('click', () => handlePlayerAttack(row, col));
             }
@@ -83,10 +95,12 @@ function initSetup() {
     gameState.playerBoard = createBoard();
     gameState.placedShips = new Set();
     gameState.selectedShip = null;
-    gameState.isHorizontal = true;
     gameState.playerShips = [];
     gameState.placementHistory = [];
     gameState.playerName = '';
+    gameState.dragging = false;
+    gameState.dragStart = null;
+    gameState.dragOrientation = true;
     
     const setupBoard = document.getElementById('player-board-setup');
     renderBoard(setupBoard, gameState.playerBoard, true, false);
@@ -119,11 +133,12 @@ function selectShip(btn) {
     gameState.selectedShip = shipName;
 }
 
-function handleSetupHover(row, col) {
+// Show a preview of where the ship would be placed
+function showPlacementPreview(row, col, isHorizontal) {
     if (!gameState.selectedShip) return;
     
     const ship = SHIPS[gameState.selectedShip];
-    const cells = getShipCells(row, col, ship.length, gameState.isHorizontal);
+    const cells = getShipCells(row, col, ship.length, isHorizontal);
     
     clearPreview();
     
@@ -138,6 +153,46 @@ function handleSetupHover(row, col) {
             }
         }
     });
+}
+
+// Begin placing a ship: press down on the starting cell
+function handleSetupDragStart(row, col) {
+    if (!gameState.selectedShip) return;
+    
+    gameState.dragging = true;
+    gameState.dragStart = { row, col };
+    gameState.dragOrientation = true; // default to horizontal until the user drags
+    showPlacementPreview(row, col, true);
+}
+
+// While hovering/dragging across cells
+function handleSetupCellEnter(row, col) {
+    if (!gameState.selectedShip) return;
+    
+    if (gameState.dragging && gameState.dragStart) {
+        const dr = row - gameState.dragStart.row;
+        const dc = col - gameState.dragStart.col;
+        // Dominant drag axis determines orientation
+        const isHorizontal = Math.abs(dc) >= Math.abs(dr);
+        gameState.dragOrientation = isHorizontal;
+        showPlacementPreview(gameState.dragStart.row, gameState.dragStart.col, isHorizontal);
+    } else {
+        // Not dragging yet: show a default horizontal preview under the cursor
+        showPlacementPreview(row, col, true);
+    }
+}
+
+// Release to place the ship
+function handleSetupDragEnd() {
+    if (!gameState.dragging) return;
+    gameState.dragging = false;
+    
+    const start = gameState.dragStart;
+    gameState.dragStart = null;
+    
+    if (!gameState.selectedShip || !start) return;
+    
+    placeShipAt(start.row, start.col, gameState.dragOrientation);
 }
 
 function clearPreview() {
@@ -171,13 +226,14 @@ function isValidPlacement(cells) {
     return true;
 }
 
-function handleSetupClick(row, col) {
+function placeShipAt(row, col, isHorizontal) {
     if (!gameState.selectedShip) return;
     
     const ship = SHIPS[gameState.selectedShip];
-    const cells = getShipCells(row, col, ship.length, gameState.isHorizontal);
+    const cells = getShipCells(row, col, ship.length, isHorizontal);
     
     if (!isValidPlacement(cells)) {
+        clearPreview();
         showModal('Invalid Placement', 'Ships cannot overlap or go off the board.');
         return;
     }
@@ -186,7 +242,7 @@ function handleSetupClick(row, col) {
     gameState.placementHistory.push({
         shipName: gameState.selectedShip,
         cells: cells.map(([r, c]) => [r, c]),
-        isHorizontal: gameState.isHorizontal
+        isHorizontal: isHorizontal
     });
     
     // Place the ship
@@ -542,15 +598,20 @@ function checkGameOver() {
 
 // Wire up all event listeners and start the game
 function init() {
-    // Rotate button
-    const rotateBtn = document.getElementById('rotate-btn');
-    if (rotateBtn) {
-        rotateBtn.addEventListener('click', () => {
-            gameState.isHorizontal = !gameState.isHorizontal;
-            rotateBtn.textContent =
-                `🔄 Rotate (${gameState.isHorizontal ? 'Horizontal' : 'Vertical'})`;
-        });
-    }
+    // Finish ship placement when the mouse/touch is released anywhere
+    document.addEventListener('mouseup', handleSetupDragEnd);
+    document.addEventListener('touchend', handleSetupDragEnd);
+
+    // Track finger movement across cells during a touch drag
+    document.addEventListener('touchmove', (e) => {
+        if (!gameState.dragging) return;
+        const touch = e.touches[0];
+        if (!touch) return;
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target && target.classList.contains('cell') && target.dataset.row !== undefined) {
+            handleSetupCellEnter(parseInt(target.dataset.row, 10), parseInt(target.dataset.col, 10));
+        }
+    }, { passive: true });
 
     // Modal close button
     const modalCloseBtn = document.getElementById('modal-close-btn');

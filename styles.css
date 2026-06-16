@@ -192,6 +192,9 @@ header h1 {
     gap: 2px;
     margin: 8px auto;
     max-width: fit-content;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
 }
 
 .cell {
