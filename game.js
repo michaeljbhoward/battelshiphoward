@@ -211,6 +211,12 @@ document.getElementById('rotate-btn').addEventListener('click', () => {
 document.getElementById('start-game-btn').addEventListener('click', startGame);
 
 function startGame() {
+    // Check if all ships are placed
+    if (gameState.placedShips.size < Object.keys(SHIPS).length) {
+        showMessage('Please place all your ships before starting the game!');
+        return;
+    }
+    
     // Initialize AI board and place ships randomly
     gameState.aiBoard = createBoard();
     gameState.aiShips = [];
