@@ -1,3 +1,8 @@
+:root {
+    /* Cell size adapts to viewport so the game fits without scrolling */
+    --cell-size: clamp(22px, 4.6vh, 38px);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -14,24 +19,24 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px 20px;
 }
 
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 10px;
 }
 
 header h1 {
-    font-size: 3rem;
+    font-size: 2rem;
     color: #00d4ff;
     text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
 }
 
 .subtitle {
-    font-size: 1.2rem;
+    font-size: 1rem;
     color: #8892b0;
-    margin-top: 5px;
+    margin-top: 2px;
 }
 
 .screen {
@@ -47,13 +52,13 @@ header h1 {
 }
 
 #setup-screen h2 {
-    font-size: 2rem;
-    margin-bottom: 20px;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
     color: #00d4ff;
 }
 
 .name-input {
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -85,7 +90,7 @@ header h1 {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     flex-wrap: wrap;
 }
 
@@ -117,7 +122,7 @@ header h1 {
 }
 
 .orientation-toggle {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .rotate-btn {
@@ -137,7 +142,7 @@ header h1 {
 }
 
 .action-buttons {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .undo-btn {
@@ -163,22 +168,22 @@ header h1 {
 
 .instructions {
     color: #8892b0;
-    margin-bottom: 20px;
-    font-size: 1rem;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
 }
 
 .board {
     display: grid;
-    grid-template-columns: repeat(10, 40px);
-    grid-template-rows: repeat(10, 40px);
+    grid-template-columns: repeat(10, var(--cell-size));
+    grid-template-rows: repeat(10, var(--cell-size));
     gap: 2px;
-    margin: 20px auto;
+    margin: 10px auto;
     max-width: fit-content;
 }
 
 .cell {
-    width: 40px;
-    height: 40px;
+    width: var(--cell-size);
+    height: var(--cell-size);
     background: #0f3460;
     border: 1px solid #1a1a2e;
     display: flex;
@@ -186,7 +191,7 @@ header h1 {
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 1.2rem;
+    font-size: calc(var(--cell-size) * 0.55);
 }
 
 .cell:hover {
@@ -239,15 +244,15 @@ header h1 {
 }
 
 .start-btn, .restart-btn, .play-again-btn {
-    padding: 15px 40px;
-    font-size: 1.2rem;
+    padding: 12px 40px;
+    font-size: 1.1rem;
     border: 2px solid #00d4ff;
     background: #00d4ff;
     color: #1a1a2e;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 20px;
+    margin-top: 12px;
 }
 
 .start-btn:hover, .restart-btn:hover, .play-again-btn:hover {
@@ -266,19 +271,19 @@ header h1 {
 }
 
 .game-status {
-    margin-bottom: 20px;
+    margin-bottom: 8px;
 }
 
 .turn-indicator {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     color: #00d4ff;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
 }
 
 .message {
-    font-size: 1.2rem;
+    font-size: 1.05rem;
     color: #ff6b6b;
-    min-height: 30px;
+    min-height: 24px;
 }
 
 .boards-container {
@@ -294,14 +299,14 @@ header h1 {
 
 .board-section h3 {
     color: #00d4ff;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .stats {
     display: flex;
     justify-content: center;
     gap: 40px;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 .stat {
@@ -342,25 +347,19 @@ header h1 {
 }
 
 @media (max-width: 768px) {
-    .board {
-        grid-template-columns: repeat(10, 32px);
-        grid-template-rows: repeat(10, 32px);
-    }
-
-    .cell {
-        width: 32px;
-        height: 32px;
-        font-size: 1rem;
+    :root {
+        /* On narrow screens, size cells to fit two boards stacked within width */
+        --cell-size: min(8vw, 4vh);
     }
 
     .boards-container {
         flex-direction: column;
         align-items: center;
+        gap: 12px;
     }
 
     .ship-selector {
-        flex-direction: column;
-        align-items: center;
+        flex-wrap: wrap;
     }
 }
 
