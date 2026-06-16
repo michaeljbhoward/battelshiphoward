@@ -1,6 +1,8 @@
 :root {
-    /* Cell size adapts to viewport so the game fits without scrolling */
-    --cell-size: clamp(22px, 4.6vh, 38px);
+    /* Cell size is derived from the leftover viewport height after the
+       surrounding controls, so the whole game fits without scrolling.
+       ~330px is reserved for headers, buttons and spacing. */
+    --cell-size: clamp(18px, calc((100vh - 330px) / 10), 38px);
 }
 
 * {
@@ -9,38 +11,48 @@
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    min-height: 100vh;
     color: #fff;
+    overflow: hidden;
 }
 
 .container {
     max-width: 1200px;
+    height: 100%;
     margin: 0 auto;
-    padding: 10px 20px;
+    padding: 8px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 header {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 header h1 {
-    font-size: 2rem;
+    font-size: 1.7rem;
     color: #00d4ff;
     text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
 }
 
 .subtitle {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #8892b0;
     margin-top: 2px;
 }
 
 .screen {
-    display: block;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
 }
 
 .screen.hidden {
@@ -52,13 +64,13 @@ header h1 {
 }
 
 #setup-screen h2 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
+    font-size: 1.3rem;
+    margin-bottom: 8px;
     color: #00d4ff;
 }
 
 .name-input {
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -71,8 +83,8 @@ header h1 {
 }
 
 .name-input input {
-    padding: 10px 15px;
-    font-size: 1rem;
+    padding: 7px 12px;
+    font-size: 0.95rem;
     border: 2px solid #00d4ff;
     background: #0f3460;
     color: #fff;
@@ -89,14 +101,14 @@ header h1 {
 .ship-selector {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 8px;
     flex-wrap: wrap;
 }
 
 .ship-btn {
-    padding: 12px 20px;
-    font-size: 1rem;
+    padding: 7px 14px;
+    font-size: 0.9rem;
     border: 2px solid #00d4ff;
     background: transparent;
     color: #00d4ff;
@@ -122,12 +134,12 @@ header h1 {
 }
 
 .orientation-toggle {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .rotate-btn {
-    padding: 10px 25px;
-    font-size: 1rem;
+    padding: 7px 20px;
+    font-size: 0.9rem;
     border: 2px solid #ff6b6b;
     background: transparent;
     color: #ff6b6b;
@@ -142,12 +154,12 @@ header h1 {
 }
 
 .action-buttons {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .undo-btn {
-    padding: 10px 20px;
-    font-size: 1rem;
+    padding: 7px 16px;
+    font-size: 0.9rem;
     border: 2px solid #ffd700;
     background: transparent;
     color: #ffd700;
@@ -168,8 +180,8 @@ header h1 {
 
 .instructions {
     color: #8892b0;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
+    margin-bottom: 6px;
+    font-size: 0.9rem;
 }
 
 .board {
@@ -177,7 +189,7 @@ header h1 {
     grid-template-columns: repeat(10, var(--cell-size));
     grid-template-rows: repeat(10, var(--cell-size));
     gap: 2px;
-    margin: 10px auto;
+    margin: 8px auto;
     max-width: fit-content;
 }
 
@@ -244,15 +256,15 @@ header h1 {
 }
 
 .start-btn, .restart-btn, .play-again-btn {
-    padding: 12px 40px;
-    font-size: 1.1rem;
+    padding: 10px 36px;
+    font-size: 1.05rem;
     border: 2px solid #00d4ff;
     background: #00d4ff;
     color: #1a1a2e;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-top: 12px;
+    margin-top: 8px;
 }
 
 .start-btn:hover, .restart-btn:hover, .play-again-btn:hover {
