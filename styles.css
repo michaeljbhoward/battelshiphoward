@@ -1,0 +1,311 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    color: #fff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 3rem;
+    color: #00d4ff;
+    text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: #8892b0;
+    margin-top: 5px;
+}
+
+.screen {
+    display: block;
+}
+
+.screen.hidden {
+    display: none;
+}
+
+#setup-screen {
+    text-align: center;
+}
+
+#setup-screen h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #00d4ff;
+}
+
+.ship-selector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.ship-btn {
+    padding: 12px 20px;
+    font-size: 1rem;
+    border: 2px solid #00d4ff;
+    background: transparent;
+    color: #00d4ff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ship-btn:hover {
+    background: #00d4ff;
+    color: #1a1a2e;
+}
+
+.ship-btn.selected {
+    background: #00d4ff;
+    color: #1a1a2e;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+}
+
+.ship-btn.placed {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.orientation-toggle {
+    margin-bottom: 15px;
+}
+
+.rotate-btn {
+    padding: 10px 25px;
+    font-size: 1rem;
+    border: 2px solid #ff6b6b;
+    background: transparent;
+    color: #ff6b6b;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.rotate-btn:hover {
+    background: #ff6b6b;
+    color: #1a1a2e;
+}
+
+.instructions {
+    color: #8892b0;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 40px);
+    grid-template-rows: repeat(10, 40px);
+    gap: 2px;
+    margin: 20px auto;
+    max-width: fit-content;
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    background: #0f3460;
+    border: 1px solid #1a1a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+}
+
+.cell:hover {
+    background: #16213e;
+    border-color: #00d4ff;
+}
+
+.cell.ship {
+    background: #4a90e2;
+    border-color: #2c5f8d;
+}
+
+.cell.hit {
+    background: #ff6b6b;
+    border-color: #c0392b;
+}
+
+.cell.hit::after {
+    content: '💥';
+}
+
+.cell.miss {
+    background: #2c3e50;
+    border-color: #34495e;
+}
+
+.cell.miss::after {
+    content: '•';
+    color: #7f8c8d;
+}
+
+.cell.ai-ship {
+    background: #4a90e2;
+    border-color: #2c5f8d;
+}
+
+.cell.ai-ship.hit {
+    background: #ff6b6b;
+    border-color: #c0392b;
+}
+
+.cell.preview {
+    background: rgba(74, 144, 226, 0.5);
+    border-color: #00d4ff;
+}
+
+.cell.preview-invalid {
+    background: rgba(255, 107, 107, 0.5);
+    border-color: #ff6b6b;
+}
+
+.start-btn, .restart-btn, .play-again-btn {
+    padding: 15px 40px;
+    font-size: 1.2rem;
+    border: 2px solid #00d4ff;
+    background: #00d4ff;
+    color: #1a1a2e;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.start-btn:hover, .restart-btn:hover, .play-again-btn:hover {
+    background: transparent;
+    color: #00d4ff;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.start-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#game-screen {
+    text-align: center;
+}
+
+.game-status {
+    margin-bottom: 20px;
+}
+
+.turn-indicator {
+    font-size: 1.5rem;
+    color: #00d4ff;
+    margin-bottom: 10px;
+}
+
+.message {
+    font-size: 1.2rem;
+    color: #ff6b6b;
+    min-height: 30px;
+}
+
+.boards-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.board-section {
+    text-align: center;
+}
+
+.board-section h3 {
+    color: #00d4ff;
+    margin-bottom: 10px;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 20px 0;
+}
+
+.stat {
+    font-size: 1.1rem;
+}
+
+.stat-label {
+    color: #8892b0;
+}
+
+.stat-value {
+    color: #00d4ff;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+#game-over-screen {
+    text-align: center;
+}
+
+#game-over-screen h2 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+#game-over-screen.winner h2 {
+    color: #00d4ff;
+}
+
+#game-over-screen.loser h2 {
+    color: #ff6b6b;
+}
+
+#game-over-message {
+    font-size: 1.3rem;
+    color: #8892b0;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 768px) {
+    .board {
+        grid-template-columns: repeat(10, 32px);
+        grid-template-rows: repeat(10, 32px);
+    }
+
+    .cell {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    .boards-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .ship-selector {
+        flex-direction: column;
+        align-items: center;
+    }
+}

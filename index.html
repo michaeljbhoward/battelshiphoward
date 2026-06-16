@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battleship - Play Against AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚓ Battleship</h1>
+            <p class="subtitle">Play against the AI</p>
+        </header>
+
+        <div id="setup-screen" class="screen">
+            <h2>Place Your Ships</h2>
+            <div class="ship-selector">
+                <button class="ship-btn" data-ship="carrier" data-length="5">Carrier (5)</button>
+                <button class="ship-btn" data-ship="battleship" data-length="4">Battleship (4)</button>
+                <button class="ship-btn" data-ship="cruiser" data-length="3">Cruiser (3)</button>
+                <button class="ship-btn" data-ship="submarine" data-length="3">Submarine (3)</button>
+                <button class="ship-btn" data-ship="destroyer" data-length="2">Destroyer (2)</button>
+            </div>
+            <div class="orientation-toggle">
+                <button id="rotate-btn" class="rotate-btn">🔄 Rotate (Horizontal)</button>
+            </div>
+            <p class="instructions">Click a ship above, then click on your board to place it.</p>
+            <div id="player-board-setup" class="board"></div>
+            <button id="start-game-btn" class="start-btn" disabled>Start Game</button>
+        </div>
+
+        <div id="game-screen" class="screen hidden">
+            <div class="game-status">
+                <div id="turn-indicator" class="turn-indicator">Your Turn</div>
+                <div id="message" class="message"></div>
+            </div>
+            
+            <div class="boards-container">
+                <div class="board-section">
+                    <h3>Your Board</h3>
+                    <div id="player-board" class="board"></div>
+                </div>
+                <div class="board-section">
+                    <h3>AI Board</h3>
+                    <div id="ai-board" class="board"></div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-label">Your Ships:</span>
+                    <span id="player-ships" class="stat-value">5</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">AI Ships:</span>
+                    <span id="ai-ships" class="stat-value">5</span>
+                </div>
+            </div>
+
+            <button id="restart-btn" class="restart-btn">New Game</button>
+        </div>
+
+        <div id="game-over-screen" class="screen hidden">
+            <h2 id="game-over-title">Game Over</h2>
+            <p id="game-over-message"></p>
+            <button id="play-again-btn" class="play-again-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
