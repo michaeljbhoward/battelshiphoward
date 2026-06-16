@@ -216,16 +216,6 @@ function handleSetupClick(row, col) {
     renderBoard(document.getElementById('player-board-setup'), gameState.playerBoard, true, false);
 }
 
-// Rotate ship
-const rotateBtn = document.getElementById('rotate-btn');
-if (rotateBtn) {
-    rotateBtn.addEventListener('click', () => {
-        gameState.isHorizontal = !gameState.isHorizontal;
-        document.getElementById('rotate-btn').textContent = 
-            `🔄 Rotate (${gameState.isHorizontal ? 'Horizontal' : 'Vertical'})`;
-    });
-}
-
 function undoLastPlacement() {
     if (gameState.placementHistory.length === 0) return;
     
@@ -416,12 +406,14 @@ function aiTurn() {
             } while (gameState.aiHits.has(`${row},${col}`) || gameState.aiMisses.has(`${row},${col}`));
         }
         
-        const cell = gameState.playerBoard[row][col];
+        const candidate = gameState.playerBoard[row][col];
         
-        if (!cell.isHit && !cell.isMiss) {
+        if (!candidate.isHit && !candidate.isMiss) {
             validCell = true;
         }
     }
+    
+    const cell = gameState.playerBoard[row][col];
     
     if (cell.hasShip) {
         cell.isHit = true;
@@ -548,28 +540,36 @@ function checkGameOver() {
     }
 }
 
-// Initialize game on load
-document.addEventListener('DOMContentLoaded', () => {
-    initSetup();
-    
+// Wire up all event listeners and start the game
+function init() {
+    // Rotate button
+    const rotateBtn = document.getElementById('rotate-btn');
+    if (rotateBtn) {
+        rotateBtn.addEventListener('click', () => {
+            gameState.isHorizontal = !gameState.isHorizontal;
+            rotateBtn.textContent =
+                `🔄 Rotate (${gameState.isHorizontal ? 'Horizontal' : 'Vertical'})`;
+        });
+    }
+
     // Modal close button
     const modalCloseBtn = document.getElementById('modal-close-btn');
     if (modalCloseBtn) {
         modalCloseBtn.addEventListener('click', hideModal);
     }
-    
+
     // Undo button
     const undoBtn = document.getElementById('undo-btn');
     if (undoBtn) {
         undoBtn.addEventListener('click', undoLastPlacement);
     }
-    
+
     // Start game button
     const startGameBtn = document.getElementById('start-game-btn');
     if (startGameBtn) {
         startGameBtn.addEventListener('click', startGame);
     }
-    
+
     // Play again button
     const playAgainBtn = document.getElementById('play-again-btn');
     if (playAgainBtn) {
@@ -579,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
             initSetup();
         });
     }
-    
+
     // Restart button
     const restartBtn = document.getElementById('restart-btn');
     if (restartBtn) {
@@ -589,4 +589,13 @@ document.addEventListener('DOMContentLoaded', () => {
             initSetup();
         });
     }
-});
+
+    initSetup();
+}
+
+// Run init whether or not the DOM has already finished loading
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
