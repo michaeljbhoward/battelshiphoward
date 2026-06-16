@@ -122,9 +122,6 @@ function initSetup() {
     // Reset undo button
     document.getElementById('undo-btn').disabled = true;
     
-    // Reset orientation label
-    updateRotateButton();
-    
     // Reset name input
     document.getElementById('player-name').value = '';
 }
@@ -204,14 +201,6 @@ function toggleOrientation() {
         showPlacementPreview(gameState.dragStart.row, gameState.dragStart.col, gameState.currentOrientation);
     } else if (gameState.lastHoverCell && gameState.selectedShip) {
         showPlacementPreview(gameState.lastHoverCell.row, gameState.lastHoverCell.col, gameState.currentOrientation);
-    }
-}
-
-// Keep the Rotate button label in sync with the current orientation
-function updateRotateButton() {
-    const btn = document.getElementById('rotate-btn');
-    if (btn) {
-        btn.textContent = `🔄 Orientation: ${gameState.currentOrientation ? 'Horizontal' : 'Vertical'}`;
     }
 }
 
@@ -668,18 +657,8 @@ function init() {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'r' || e.key === 'R') {
             toggleOrientation();
-            updateRotateButton();
         }
     });
-
-    // Rotate button toggles orientation
-    const rotateBtn = document.getElementById('rotate-btn');
-    if (rotateBtn) {
-        rotateBtn.addEventListener('click', () => {
-            toggleOrientation();
-            updateRotateButton();
-        });
-    }
 
     // Right-click on the setup board also flips orientation
     const setupBoard = document.getElementById('player-board-setup');
@@ -687,7 +666,6 @@ function init() {
         setupBoard.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             toggleOrientation();
-            updateRotateButton();
         });
     }
 
