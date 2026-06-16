@@ -16,7 +16,6 @@ let gameState = {
     playerShips: [],
     aiShips: [],
     selectedShip: null,
-    isHorizontal: true,
     isPlayerTurn: true,
     gameOver: false,
     placedShips: new Set(),
@@ -106,14 +105,21 @@ function initSetup() {
     gameState.dragOrientation = true;
     gameState.currentOrientation = true;
     gameState.lastHoverCell = null;
+    gameState.gameOver = false;
+    gameState.isPlayerTurn = true;
+    gameState.aiHits = new Set();
+    gameState.aiMisses = new Set();
+    gameState.aiTargetMode = false;
+    gameState.aiTargetCells = [];
     
     const setupBoard = document.getElementById('player-board-setup');
     renderBoard(setupBoard, gameState.playerBoard, true, false);
     
-    // Setup ship buttons
+    // Setup ship buttons (use onclick to avoid stacking listeners across games)
     document.querySelectorAll('.ship-btn').forEach(btn => {
-        btn.addEventListener('click', () => selectShip(btn));
+        btn.onclick = () => selectShip(btn);
         btn.classList.remove('placed');
+        btn.classList.remove('selected');
     });
     
     // Enable start button - validation will happen on click
@@ -467,33 +473,43 @@ function aiTurn() {
     if (gameState.gameOver) return;
     
     let row, col;
-    let validCell = false;
     
-    // Keep trying until we find a valid cell
-    while (!validCell) {
-        if (gameState.aiTargetMode && gameState.aiTargetCells.length > 0) {
-            // Target mode: attack adjacent cells
-            const target = gameState.aiTargetCells.shift();
+    // Prefer target-mode cells that haven't been attacked yet
+    while (gameState.aiTargetMode && gameState.aiTargetCells.length > 0) {
+        const target = gameState.aiTargetCells.shift();
+        const candidate = gameState.playerBoard[target.row][target.col];
+        if (!candidate.isHit && !candidate.isMiss) {
             row = target.row;
             col = target.col;
-        } else {
-            // Random mode
-            do {
-                row = Math.floor(Math.random() * BOARD_SIZE);
-                col = Math.floor(Math.random() * BOARD_SIZE);
-            } while (gameState.aiHits.has(`${row},${col}`) || gameState.aiMisses.has(`${row},${col}`));
+            break;
         }
-        
-        const candidate = gameState.playerBoard[row][col];
-        
-        if (!candidate.isHit && !candidate.isMiss) {
-            validCell = true;
+    }
+    
+    // Otherwise pick a random un-attacked cell (no infinite-loop risk)
+    if (row === undefined) {
+        const available = [];
+        for (let r = 0; r < BOARD_SIZE; r++) {
+            for (let c = 0; c < BOARD_SIZE; c++) {
+                const candidate = gameState.playerBoard[r][c];
+                if (!candidate.isHit && !candidate.isMiss) {
+                    available.push({ row: r, col: c });
+                }
+            }
+        }
+        if (available.length === 0) return; // safety: nothing left to attack
+        const pick = available[Math.floor(Math.random() * available.length)];
+        row = pick.row;
+        col = pick.col;
+        if (gameState.aiTargetCells.length === 0) {
+            gameState.aiTargetMode = false;
         }
     }
     
     const cell = gameState.playerBoard[row][col];
+    let wasHit = false;
     
     if (cell.hasShip) {
+        wasHit = true;
         cell.isHit = true;
         gameState.aiHits.add(`${row},${col}`);
         showMessage('AI hit your ship! 💥');
@@ -512,8 +528,12 @@ function aiTurn() {
             }
         });
         
-        // Check if ship is sunk
-        checkPlayerShipSunk(cell.shipName);
+        // Check if ship is sunk; stop hunting around a finished ship
+        const sunk = checkPlayerShipSunk(cell.shipName);
+        if (sunk) {
+            gameState.aiTargetMode = false;
+            gameState.aiTargetCells = [];
+        }
     } else {
         cell.isMiss = true;
         gameState.aiMisses.add(`${row},${col}`);
@@ -528,7 +548,12 @@ function aiTurn() {
     updateStats();
     checkGameOver();
     
-    if (!gameState.gameOver) {
+    if (gameState.gameOver) return;
+    
+    if (wasHit) {
+        // A hit earns another shot — same rule the player enjoys
+        setTimeout(aiTurn, 1000);
+    } else {
         gameState.isPlayerTurn = true;
         updateTurnIndicator();
         // Re-render the opponent board so attack clicks work again
@@ -554,16 +579,18 @@ function getAdjacentCells(row, col) {
 
 function checkPlayerShipSunk(shipName) {
     const ship = gameState.playerShips.find(s => s.name === shipName);
-    if (!ship) return;
+    if (!ship) return false;
     
     // Don't increment if already sunk
-    if (ship.hits >= ship.length) return;
+    if (ship.hits >= ship.length) return false;
     
     ship.hits++;
     
     if (ship.hits === ship.length) {
         showMessage(`AI sunk your ${ship.name}! 😢`);
+        return true;
     }
+    return false;
 }
 
 // UI updates
