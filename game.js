@@ -217,14 +217,14 @@ function handleSetupClick(row, col) {
 }
 
 // Rotate ship
-document.getElementById('rotate-btn').addEventListener('click', () => {
-    gameState.isHorizontal = !gameState.isHorizontal;
-    document.getElementById('rotate-btn').textContent = 
-        `🔄 Rotate (${gameState.isHorizontal ? 'Horizontal' : 'Vertical'})`;
-});
-
-// Undo button
-document.getElementById('undo-btn').addEventListener('click', undoLastPlacement);
+const rotateBtn = document.getElementById('rotate-btn');
+if (rotateBtn) {
+    rotateBtn.addEventListener('click', () => {
+        gameState.isHorizontal = !gameState.isHorizontal;
+        document.getElementById('rotate-btn').textContent = 
+            `🔄 Rotate (${gameState.isHorizontal ? 'Horizontal' : 'Vertical'})`;
+    });
+}
 
 function undoLastPlacement() {
     if (gameState.placementHistory.length === 0) return;
@@ -266,10 +266,6 @@ function hideModal() {
     document.getElementById('modal').classList.add('hidden');
 }
 
-document.getElementById('modal-close-btn').addEventListener('click', hideModal);
-
-// Start game
-document.getElementById('start-game-btn').addEventListener('click', startGame);
 
 function startGame() {
     // Get player name
@@ -552,18 +548,45 @@ function checkGameOver() {
     }
 }
 
-// Restart buttons
-document.getElementById('restart-btn').addEventListener('click', () => {
-    document.getElementById('game-screen').classList.add('hidden');
-    document.getElementById('setup-screen').classList.remove('hidden');
-    initSetup();
-});
-
-document.getElementById('play-again-btn').addEventListener('click', () => {
-    document.getElementById('game-over-screen').classList.add('hidden');
-    document.getElementById('setup-screen').classList.remove('hidden');
-    initSetup();
-});
-
 // Initialize game on load
-initSetup();
+document.addEventListener('DOMContentLoaded', () => {
+    initSetup();
+    
+    // Modal close button
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', hideModal);
+    }
+    
+    // Undo button
+    const undoBtn = document.getElementById('undo-btn');
+    if (undoBtn) {
+        undoBtn.addEventListener('click', undoLastPlacement);
+    }
+    
+    // Start game button
+    const startGameBtn = document.getElementById('start-game-btn');
+    if (startGameBtn) {
+        startGameBtn.addEventListener('click', startGame);
+    }
+    
+    // Play again button
+    const playAgainBtn = document.getElementById('play-again-btn');
+    if (playAgainBtn) {
+        playAgainBtn.addEventListener('click', () => {
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            initSetup();
+        });
+    }
+    
+    // Restart button
+    const restartBtn = document.getElementById('restart-btn');
+    if (restartBtn) {
+        restartBtn.addEventListener('click', () => {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            initSetup();
+        });
+    }
+});
