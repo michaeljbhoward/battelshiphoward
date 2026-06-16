@@ -23,7 +23,9 @@ let gameState = {
     aiHits: new Set(),
     aiMisses: new Set(),
     aiTargetMode: false,
-    aiTargetCells: []
+    aiTargetCells: [],
+    playerName: '',
+    placementHistory: []
 };
 
 // Initialize boards
@@ -83,6 +85,8 @@ function initSetup() {
     gameState.selectedShip = null;
     gameState.isHorizontal = true;
     gameState.playerShips = [];
+    gameState.placementHistory = [];
+    gameState.playerName = '';
     
     const setupBoard = document.getElementById('player-board-setup');
     renderBoard(setupBoard, gameState.playerBoard, true, false);
@@ -95,6 +99,12 @@ function initSetup() {
     
     // Enable start button - validation will happen on click
     document.getElementById('start-game-btn').disabled = false;
+    
+    // Reset undo button
+    document.getElementById('undo-btn').disabled = true;
+    
+    // Reset name input
+    document.getElementById('player-name').value = '';
 }
 
 function selectShip(btn) {
@@ -168,9 +178,16 @@ function handleSetupClick(row, col) {
     const cells = getShipCells(row, col, ship.length, gameState.isHorizontal);
     
     if (!isValidPlacement(cells)) {
-        showMessage('Invalid placement! Ships cannot overlap or go off the board.');
+        showModal('Invalid Placement', 'Ships cannot overlap or go off the board.');
         return;
     }
+    
+    // Save placement history for undo
+    gameState.placementHistory.push({
+        shipName: gameState.selectedShip,
+        cells: cells.map(([r, c]) => [r, c]),
+        isHorizontal: gameState.isHorizontal
+    });
     
     // Place the ship
     cells.forEach(([r, c]) => {
@@ -193,6 +210,9 @@ function handleSetupClick(row, col) {
     btn.classList.remove('selected');
     gameState.selectedShip = null;
     
+    // Enable undo button
+    document.getElementById('undo-btn').disabled = false;
+    
     renderBoard(document.getElementById('player-board-setup'), gameState.playerBoard, true, false);
 }
 
@@ -203,13 +223,63 @@ document.getElementById('rotate-btn').addEventListener('click', () => {
         `🔄 Rotate (${gameState.isHorizontal ? 'Horizontal' : 'Vertical'})`;
 });
 
+// Undo button
+document.getElementById('undo-btn').addEventListener('click', undoLastPlacement);
+
+function undoLastPlacement() {
+    if (gameState.placementHistory.length === 0) return;
+    
+    const lastPlacement = gameState.placementHistory.pop();
+    
+    // Remove ship from board
+    lastPlacement.cells.forEach(([r, c]) => {
+        gameState.playerBoard[r][c].hasShip = false;
+        gameState.playerBoard[r][c].shipName = null;
+    });
+    
+    // Remove from placed ships
+    gameState.placedShips.delete(lastPlacement.shipName);
+    
+    // Remove from player ships array
+    gameState.playerShips = gameState.playerShips.filter(s => s.name !== lastPlacement.shipName);
+    
+    // Update UI
+    const btn = document.querySelector(`[data-ship="${lastPlacement.shipName}"]`);
+    btn.classList.remove('placed');
+    
+    // Disable undo button if no more placements
+    if (gameState.placementHistory.length === 0) {
+        document.getElementById('undo-btn').disabled = true;
+    }
+    
+    renderBoard(document.getElementById('player-board-setup'), gameState.playerBoard, true, false);
+}
+
+// Modal functions
+function showModal(title, message) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').textContent = message;
+    document.getElementById('modal').classList.remove('hidden');
+}
+
+function hideModal() {
+    document.getElementById('modal').classList.add('hidden');
+}
+
+document.getElementById('modal-close-btn').addEventListener('click', hideModal);
+
 // Start game
 document.getElementById('start-game-btn').addEventListener('click', startGame);
 
 function startGame() {
+    // Get player name
+    const nameInput = document.getElementById('player-name');
+    gameState.playerName = nameInput.value.trim() || 'Player';
+    
     // Check if all ships are placed
     if (gameState.placedShips.size < Object.keys(SHIPS).length) {
-        showMessage('Please place all your ships before starting the game!');
+        const remaining = Object.keys(SHIPS).length - gameState.placedShips.size;
+        showModal('Ships Not Placed', `Please place all ${Object.keys(SHIPS).length} ships before starting the game. You still need to place ${remaining} ship(s).`);
         return;
     }
     
@@ -431,7 +501,8 @@ function checkPlayerShipSunk(shipName) {
 // UI updates
 function updateTurnIndicator() {
     const indicator = document.getElementById('turn-indicator');
-    indicator.textContent = gameState.isPlayerTurn ? 'Your Turn' : 'AI Turn';
+    const displayName = gameState.playerName || 'Player';
+    indicator.textContent = gameState.isPlayerTurn ? `${displayName}'s Turn` : 'AI Turn';
     indicator.style.color = gameState.isPlayerTurn ? '#00d4ff' : '#ff6b6b';
 }
 
