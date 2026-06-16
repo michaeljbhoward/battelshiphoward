@@ -93,7 +93,8 @@ function initSetup() {
         btn.classList.remove('placed');
     });
     
-    document.getElementById('start-game-btn').disabled = true;
+    // Enable start button - validation will happen on click
+    document.getElementById('start-game-btn').disabled = false;
 }
 
 function selectShip(btn) {
@@ -193,11 +194,6 @@ function handleSetupClick(row, col) {
     gameState.selectedShip = null;
     
     renderBoard(document.getElementById('player-board-setup'), gameState.playerBoard, true, false);
-    
-    // Check if all ships are placed
-    if (gameState.placedShips.size === Object.keys(SHIPS).length) {
-        document.getElementById('start-game-btn').disabled = false;
-    }
 }
 
 // Rotate ship
