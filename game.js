@@ -83,7 +83,7 @@ function renderBoard(boardElement, board, isSetup = false, isAI = false) {
                     e.preventDefault();
                     handleSetupDragStart(row, col);
                 }, { passive: false });
-            } else if (!isAI && gameState.isPlayerTurn && !gameState.gameOver) {
+            } else if (isAI && gameState.isPlayerTurn && !gameState.gameOver) {
                 cell.addEventListener('click', () => handlePlayerAttack(row, col));
             }
             
@@ -541,6 +541,8 @@ function aiTurn() {
     if (!gameState.gameOver) {
         gameState.isPlayerTurn = true;
         updateTurnIndicator();
+        // Re-render the opponent board so attack clicks work again
+        renderBoard(document.getElementById('ai-board'), gameState.aiBoard, false, true);
     }
 }
 
