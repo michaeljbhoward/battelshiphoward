@@ -83,7 +83,8 @@ function renderBoard(boardElement, board, isSetup = false, isAI = false) {
                     e.preventDefault();
                     handleSetupDragStart(row, col);
                 }, { passive: false });
-            } else if (isAI && gameState.isPlayerTurn && !gameState.gameOver) {
+            } else if (isAI) {
+                // Always listen; handlePlayerAttack guards turn/game-over state
                 cell.addEventListener('click', () => handlePlayerAttack(row, col));
             }
             
@@ -595,11 +596,27 @@ function showMessage(msg) {
 }
 
 function updateStats() {
-    const playerRemaining = gameState.playerShips.filter(s => s.hits < s.length).length;
-    const aiRemaining = gameState.aiShips.filter(s => s.hits < s.length).length;
+    const totalShips = Object.keys(SHIPS).length;
+    const playerSunk = gameState.playerShips.filter(s => s.hits >= s.length).length;
+    const aiSunk = gameState.aiShips.filter(s => s.hits >= s.length).length;
+    const playerRemaining = gameState.playerShips.length - playerSunk;
+    const aiRemaining = gameState.aiShips.length - aiSunk;
     
     document.getElementById('player-ships').textContent = playerRemaining;
     document.getElementById('ai-ships').textContent = aiRemaining;
+    
+    // Scoreboard: how many enemy ships each side has sunk
+    const playerSunkEl = document.getElementById('player-sunk');
+    const aiSunkEl = document.getElementById('ai-sunk');
+    if (playerSunkEl) playerSunkEl.textContent = aiSunk;
+    if (aiSunkEl) aiSunkEl.textContent = playerSunk;
+    
+    document.querySelectorAll('.score-total').forEach(el => {
+        el.textContent = `/ ${totalShips}`;
+    });
+    
+    const scoreName = document.getElementById('score-player-name');
+    if (scoreName) scoreName.textContent = gameState.playerName || 'You';
 }
 
 function checkGameOver() {

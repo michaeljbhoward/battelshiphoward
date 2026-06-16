@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Battleship - Play Against AI</title>
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
     <div class="container">
@@ -57,12 +57,26 @@
 
             <div class="stats">
                 <div class="stat">
-                    <span class="stat-label">Your Ships:</span>
+                    <span class="stat-label">Your Ships Left:</span>
                     <span id="player-ships" class="stat-value">5</span>
                 </div>
                 <div class="stat">
-                    <span class="stat-label">AI Ships:</span>
+                    <span class="stat-label">AI Ships Left:</span>
                     <span id="ai-ships" class="stat-value">5</span>
+                </div>
+            </div>
+
+            <div class="scoreboard">
+                <div class="score-card you">
+                    <div class="score-name" id="score-player-name">You</div>
+                    <div class="score-value"><span id="player-sunk">0</span> <span class="score-total">/ 5</span></div>
+                    <div class="score-caption">Enemy ships sunk</div>
+                </div>
+                <div class="score-divider">VS</div>
+                <div class="score-card ai">
+                    <div class="score-name">AI</div>
+                    <div class="score-value"><span id="ai-sunk">0</span> <span class="score-total">/ 5</span></div>
+                    <div class="score-caption">Your ships sunk</div>
                 </div>
             </div>
 
@@ -85,6 +99,6 @@
         </div>
     </div>
 
-    <script src="game.js?v=9"></script>
+    <script src="game.js?v=10"></script>
 </body>
 </html>
