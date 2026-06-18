@@ -464,7 +464,7 @@ function checkAIShipSunk(shipName) {
     ship.hits++;
     
     if (ship.hits === ship.length) {
-        showMessage(`You sunk the AI's ${ship.name}! 🚢💥`);
+        showMessage(`You sunk the AI's ${SHIPS[ship.name].name}! 🚢💥`);
     }
 }
 
@@ -587,7 +587,7 @@ function checkPlayerShipSunk(shipName) {
     ship.hits++;
     
     if (ship.hits === ship.length) {
-        showMessage(`AI sunk your ${ship.name}! 😢`);
+        showMessage(`AI sunk your ${SHIPS[ship.name].name}! 😢`);
         return true;
     }
     return false;
