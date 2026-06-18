@@ -1,0 +1,21 @@
+{
+  "name": "battleshiphoward",
+  "version": "1.0.0",
+  "description": "A browser-based Battleship game you play against an AI opponent",
+  "main": "game.js",
+  "scripts": {
+    "start": "http-server . -p 8000 -c-1",
+    "serve": "http-server . -p 8000 -c-1"
+  },
+  "keywords": [
+    "battleship",
+    "game",
+    "ai",
+    "browser"
+  ],
+  "author": "michaeljbhoward",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
