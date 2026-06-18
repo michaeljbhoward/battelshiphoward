@@ -737,9 +737,22 @@ function init() {
     initSetup();
 }
 
-// Run init whether or not the DOM has already finished loading
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+// Expose internals for unit testing (no-op in the browser)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        BOARD_SIZE, SHIPS, gameState,
+        createBoard, getShipCells, isValidPlacement, isValidAIPlacement,
+        getAdjacentCells, checkAIShipSunk, checkPlayerShipSunk, checkGameOver,
+        handlePlayerAttack, aiTurn, placeAIShip, initSetup, startGame,
+        selectShip, placeShipAt, undoLastPlacement, renderBoard,
+        showMessage, updateStats, updateTurnIndicator, showModal, hideModal,
+        toggleOrientation, init
+    };
 } else {
-    init();
+    // Run init whether or not the DOM has already finished loading
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 }
