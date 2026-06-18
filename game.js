@@ -10,7 +10,7 @@ const SHIPS = {
 };
 
 // Game state
-let gameState = {
+const gameState = {
     playerBoard: [],
     aiBoard: [],
     playerShips: [],
@@ -340,7 +340,6 @@ function hideModal() {
     document.getElementById('modal').classList.add('hidden');
 }
 
-
 function startGame() {
     // Get player name
     const nameInput = document.getElementById('player-name');
@@ -356,8 +355,6 @@ function startGame() {
     // Initialize AI board and place ships randomly
     gameState.aiBoard = createBoard();
     gameState.aiShips = [];
-    // Reset player ships array to ensure clean state
-    gameState.playerShips = gameState.playerShips.filter(s => s.hits < s.length);
     
     for (const [shipName, ship] of Object.entries(SHIPS)) {
         placeAIShip(shipName, ship.length);
