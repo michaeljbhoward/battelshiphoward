@@ -33,6 +33,11 @@ let gameState = {
     aiTimer: null
 };
 
+// Expose state for automated tests / debugging (no effect on gameplay)
+if (typeof window !== 'undefined') {
+    window.gameState = gameState;
+}
+
 // Initialize boards
 function createBoard() {
     return Array(BOARD_SIZE).fill(null).map(() => 

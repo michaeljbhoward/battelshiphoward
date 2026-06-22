@@ -1,0 +1,16 @@
+{
+  "name": "battleship-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Battleship vs AI - browser game with Playwright UI tests",
+  "scripts": {
+    "serve": "python3 serve.py",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  }
+}
