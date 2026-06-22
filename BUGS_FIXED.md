@@ -46,6 +46,11 @@ A short record of the bugs uncovered during development and how each was resolve
 - **Cause:** A sunk ship could keep incrementing its hit total.
 - **Fix:** Added a guard that stops counting once `hits >= length`.
 
+### 8b. Stale AI timer caused a false "You Lost" after restart
+- **Symptom:** Clicking "New Game" during the AI's 1-second delay could pop a "You Lost!" screen over the fresh setup a moment later.
+- **Cause:** The pending `setTimeout(aiTurn)` still fired after `initSetup()` reset the board, then attacked an empty board where `playerShips` was empty, tripping the loss condition.
+- **Fix:** The AI timer is now tracked and cancelled on reset, plus `aiTurn` bails early if no game is active. Verified with an automated test.
+
 ---
 
 ## UI / UX Bugs

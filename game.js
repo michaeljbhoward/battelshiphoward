@@ -29,7 +29,8 @@ let gameState = {
     dragStart: null,
     dragOrientation: true,
     currentOrientation: true,
-    lastHoverCell: null
+    lastHoverCell: null,
+    aiTimer: null
 };
 
 // Initialize boards
@@ -94,6 +95,10 @@ function renderBoard(boardElement, board, isSetup = false, isAI = false) {
 
 // Setup phase
 function initSetup() {
+    // Cancel any pending AI turn from a previous game so it can't fire on the fresh board
+    clearTimeout(gameState.aiTimer);
+    gameState.aiTimer = null;
+    
     gameState.playerBoard = createBoard();
     gameState.placedShips = new Set();
     gameState.selectedShip = null;
@@ -445,8 +450,8 @@ function handlePlayerAttack(row, col) {
         gameState.isPlayerTurn = false;
         updateTurnIndicator();
         
-        // AI's turn
-        setTimeout(aiTurn, 1000);
+        // AI's turn (track timer so a restart can cancel it)
+        gameState.aiTimer = setTimeout(aiTurn, 1000);
     }
     
     renderBoard(document.getElementById('ai-board'), gameState.aiBoard, false, true);
@@ -470,7 +475,8 @@ function checkAIShipSunk(shipName) {
 
 // AI turn
 function aiTurn() {
-    if (gameState.gameOver) return;
+    // Bail if the game isn't active (e.g., a stale timer fired after a restart)
+    if (gameState.gameOver || gameState.playerShips.length === 0) return;
     
     let row, col;
     
@@ -551,8 +557,8 @@ function aiTurn() {
     if (gameState.gameOver) return;
     
     if (wasHit) {
-        // A hit earns another shot — same rule the player enjoys
-        setTimeout(aiTurn, 1000);
+        // A hit earns another shot — same rule the player enjoys (track timer)
+        gameState.aiTimer = setTimeout(aiTurn, 1000);
     } else {
         gameState.isPlayerTurn = true;
         updateTurnIndicator();
