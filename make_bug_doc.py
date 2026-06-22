@@ -91,6 +91,12 @@ bug(8, 'Hit counts overflowed', [
     ('Fix', 'Added a guard that stops counting once hits reach the ship length.'),
 ])
 
+bug('8b', 'Stale AI timer caused a false "You Lost" after restart', [
+    ('Symptom', 'Clicking "New Game" during the AI\u2019s 1-second delay could pop a "You Lost!" screen over the fresh setup a moment later.'),
+    ('Cause', 'The pending AI-turn timer still fired after the board was reset, then attacked an empty board where the player had no ships \u2014 tripping the loss condition.'),
+    ('Fix', 'The AI timer is now tracked and cancelled on reset, and the AI turn bails out early if no game is active. Verified with an automated test.'),
+])
+
 section('UI / UX Bugs')
 
 bug(9, 'Page required scrolling', [
@@ -109,7 +115,8 @@ bug(11, "Edits didn't appear in the browser", [
 
 section('How Fixes Were Verified')
 
-doc.add_paragraph('Beyond manual play-testing, the logic was checked with automated tests run in a JavaScript engine (jsc) using a DOM stub:')
+p = doc.add_paragraph()
+p.add_run('Logic tests (JavaScript engine, DOM-stubbed): ').bold = True
 for line in [
     'Syntax/parse check passes',
     'Ship placement and validation (including off-board) are correct',
@@ -121,7 +128,18 @@ for line in [
 ]:
     doc.add_paragraph(line, style='List Bullet')
 
-closing = doc.add_paragraph('All checks passed.')
+p2 = doc.add_paragraph()
+p2.add_run('Browser UI tests (Playwright, Chromium + Firefox): ').bold = True
+for line in [
+    'Places all ships through the UI and starts a game',
+    'Player can win by clicking every AI ship cell',
+    'Re-attacking the same cell is rejected',
+    'R key rotates a ship to vertical placement',
+    'Restarting during the AI delay does not cause a false loss',
+]:
+    doc.add_paragraph(line, style='List Bullet')
+
+closing = doc.add_paragraph('All checks passed (10 browser tests across 2 engines, plus the logic suites).')
 closing.runs[0].bold = True
 
 out = 'Battleship_Bugs_Fixed.docx'
